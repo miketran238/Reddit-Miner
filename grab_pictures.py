@@ -83,7 +83,7 @@ def get_pictures_from_subreddit(data, subreddit, location):
             except:
                 pass
 
-def main2():
+def main():
     colorama.init()
     ua = UserAgent()
     parser = argparse.ArgumentParser(
@@ -92,20 +92,21 @@ def main2():
                         required=True, help='Exact name of the subreddits you want to grab pictures')
     parser.add_argument('-n', '--number', type=int, metavar='', default=50,
                         help='Optionally specify number of images to be downloaded (default=50)')
-    parser.add_argument('-t', '--top', type=str, metavar='', choices=['day', 'week', 'month', 'year', 'all'],
-                        default='week', help='Optionally specify whether top posts of [day, week, month, year or all] (default=week)')
+    # parser.add_argument('-t', '--top', type=str, metavar='', choices=['day', 'week', 'month', 'year', 'all'],
+    #                     default='week', help='Optionally specify whether top posts of [day, week, month, year or all] (default=week)')
     parser.add_argument('-loc', '--location', type=str, metavar='', default='',
                         help='Optionally specify the directory/location to be downloaded')
     parser.add_argument('-a', '--after', type=str, metavar='', default='',
                         help='Optionally specify after timestamp yyyy-mm-dd')
     parser.add_argument('-b', '--before', type=str, metavar='', default='',
                         help='Optionally specify before timestamp yyyy-mm-dd')
-    parser.add_argument('-score', '--score', type=int, metavar='', default='',
+    parser.add_argument('-score', '--score', type=int, metavar='', default='0',
                         help='Optionally score is bigger than this')
     args = parser.parse_args()
 
     for j in range(len(args.subreddit)):
         print('Connecting to r/' + args.subreddit[j])
+        # Example url
         # url = 'https://api.pushshift.io/reddit/search/submission/?subreddit=itookapicture&limit=99999&after=2018-08-24'
         url = 'https://api.pushshift.io/reddit/search/submission/?subreddit=' + args.subreddit[j] + '&limit=' + str(args.number)
         if ( args.after ):
@@ -137,49 +138,5 @@ def main2():
         erase_previous_line()
         print('Downloaded pictures from r/' + args.subreddit[j])
 
-
-def main():
-    colorama.init()
-    ua = UserAgent()
-    parser = argparse.ArgumentParser(
-        description='Fetch images from a subreddit (eg: python3 grab_pictures.py -s itookapicture CozyPlaces -n 100 -t all)')
-    parser.add_argument('-s', '--subreddit', nargs='+', type=str, metavar='',
-                        required=True, help='Exact name of the subreddits you want to grab pictures')
-    parser.add_argument('-n', '--number', type=int, metavar='', default=50,
-                        help='Optionally specify number of images to be downloaded (default=50)')
-    parser.add_argument('-t', '--top', type=str, metavar='', choices=['day', 'week', 'month', 'year', 'all'],
-                        default='week', help='Optionally specify whether top posts of [day, week, month, year or all] (default=week)')
-    parser.add_argument('-loc', '--location', type=str, metavar='', default='',
-                        help='Optionally specify the directory/location to be downloaded')
-    args = parser.parse_args()
-
-    for j in range(len(args.subreddit)):
-        print('Connecting to r/' + args.subreddit[j])
-        url = 'https://www.reddit.com/r/' + args.subreddit[j] + '/top/.json?sort=top&t=' + \
-            args.top + '&limit=' + str(args.number)
-        print(url)
-        response = requests.get(url, headers={'User-agent': ua.random})
-        if os.path.exists(args.location):
-            location = os.path.join(args.location, args.subreddit[j])
-        else:
-            print('Given path does not exist, try without the location parameter to default to the current directory')
-            exit()
-
-        if not response.ok:
-            print("Error check the name of the subreddit", response.status_code)
-            exit()
-
-        if not os.path.exists(location):
-            os.mkdir(location)
-        # notify connected and downloading pictures from subreddit
-        erase_previous_line()
-        print('downloading pictures from r/' + args.subreddit[j] + '..')
-
-        data = response.json()['data']['children']
-        get_pictures_from_subreddit(data, args.subreddit[j], location)
-        erase_previous_line()
-        print('Downloaded pictures from r/' + args.subreddit[j])
-
-
 if __name__ == '__main__':
-    main2()
+    main()
